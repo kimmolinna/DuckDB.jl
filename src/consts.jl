@@ -1,5 +1,5 @@
 @enum DUCKDB_TYPE_::UInt32 begin 
-	DUCKDB_TYPE_INVALID=1
+	DUCKDB_TYPE_INVALID=0
 	DUCKDB_TYPE_BOOLEAN
 	DUCKDB_TYPE_TINYINT
 	DUCKDB_TYPE_SMALLINT
@@ -21,50 +21,11 @@
 end
 
 const DUCKDB_TYPE = DUCKDB_TYPE_
-#=
-typedef enum DUCKDB_TYPE {
-	DUCKDB_TYPE_INVALID = 0,
-	// bool
-	DUCKDB_TYPE_BOOLEAN,
-	// int8_t
-	DUCKDB_TYPE_TINYINT,
-	// int16_t
-	DUCKDB_TYPE_SMALLINT,
-	// int32_t
-	DUCKDB_TYPE_INTEGER,
-	// int64_t
-	DUCKDB_TYPE_BIGINT,
-	// uint8_t
-	DUCKDB_TYPE_UTINYINT,
-	// uint16_t
-	DUCKDB_TYPE_USMALLINT,
-	// uint32_t
-	DUCKDB_TYPE_UINTEGER,
-	// uint64_t
-	DUCKDB_TYPE_UBIGINT,
-	// float
-	DUCKDB_TYPE_FLOAT,
-	// double
-	DUCKDB_TYPE_DOUBLE,
-	// duckdb_timestamp
-	DUCKDB_TYPE_TIMESTAMP,
-	// duckdb_date
-	DUCKDB_TYPE_DATE,
-	// duckdb_time
-	DUCKDB_TYPE_TIME,
-	// duckdb_interval
-	DUCKDB_TYPE_INTERVAL,
-	// duckdb_hugeint
-	DUCKDB_TYPE_HUGEINT,
-	// const char*
-	DUCKDB_TYPE_VARCHAR,
-	// duckdb_blob
-	DUCKDB_TYPE_BLOB
-} duckdb_type;
-=#
+
 """
-Days are stored as days since 1970-01-01
+Days are stored as days since 1970-01-01\n
 Use the duckdb_from_date/duckdb_to_date function to extract individual information
+
 """
 struct duckdb_date 
 	days::Int32
@@ -77,8 +38,9 @@ struct duckdb_date_struct
 end
 
 """
-Time is stored as microseconds since 00:00:00
+Time is stored as microseconds since 00:00:00\n
 Use the duckdb_from_time/duckdb_to_time function to extract individual information
+
 """
 struct duckdb_time
 	micros::Int64
@@ -92,8 +54,9 @@ struct duckdb_time_struct
 end
 
 """
-Timestamps are stored as microseconds since 1970-01-01
+Timestamps are stored as microseconds since 1970-01-01\n
 Use the duckdb_from_timestamp/duckdb_to_timestamp function to extract individual information
+
 """
 struct duckdb_timestamp 
 	micros::Int64
@@ -111,9 +74,10 @@ struct duckdb_interval
 end
 
 """
-Hugeints are composed in a (lower, upper) component
-The value of the hugeint is upper * 2^64 + lower
+Hugeints are composed in a (lower, upper) component\n
+The value of the hugeint is upper * 2^64 + lower\n
 For easy usage, the functions duckdb_hugeint_to_double/duckdb_double_to_hugeint are recommended
+
 """
 struct duckdb_hugeint
 	lower::UInt64
@@ -142,4 +106,23 @@ struct duckdb_result
 	internal_data::Ptr{Cvoid}
 end
 
-duckdb_types = (missing,UInt8,Int8,Int16,Int32,Int64,UInt8,UInt16,UInt32,UInt64,Float32,Float64,Int64,Int32,Int64,duckdb_interval,duckdb_hugeint,Ptr{UInt8},duckdb_blob)
+DUCKDB_TYPES = Dict(
+	DUCKDB_TYPE_BOOLEAN => UInt8,
+	DUCKDB_TYPE_TINYINT => Int8,
+	DUCKDB_TYPE_SMALLINT => Int16,
+	DUCKDB_TYPE_INTEGER => Int32,
+	DUCKDB_TYPE_BIGINT => Int64,
+	DUCKDB_TYPE_UTINYINT => UInt8,
+	DUCKDB_TYPE_USMALLINT => UInt16,
+	DUCKDB_TYPE_UINTEGER => UInt32,
+	DUCKDB_TYPE_UBIGINT => UInt64,
+	DUCKDB_TYPE_FLOAT => Float32,
+	DUCKDB_TYPE_DOUBLE => Float64,
+	DUCKDB_TYPE_TIMESTAMP => Int64,
+	DUCKDB_TYPE_DATE => Int32,
+	DUCKDB_TYPE_TIME => Int64,
+	DUCKDB_TYPE_INTERVAL => Ref{duckdb_interval},
+	DUCKDB_TYPE_HUGEINT => Ref{duckdb_hugeint},
+	DUCKDB_TYPE_VARCHAR => Ptr{UInt8},
+	DUCKDB_TYPE_BLOB => Ref{duckdb_blob}
+)
