@@ -64,7 +64,7 @@ Note that failing to call duckdb_close (in case of e.g. a program crash) will no
 *`database`: the database object to shut down.
 
 """
-function closedb(database)
+function close(database)
     duckdb_close(database)
 end
 
