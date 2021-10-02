@@ -4,12 +4,13 @@ include("api.jl")
 include("consts.jl")
 
 """
+    toDataFrame(result)
 Creates a DataFrame from the full result
-* result: the full result from dbExecute
-* returns: The abstractdataframe
+* `result`: the full result from `execute`
+* returns: the abstract dataframe
 
 """
-function toDF(result)
+function toDataFrame(result)
     columns=unsafe_wrap(Array{duckdb_column},result[].columns,Int64(result[].column_count));
     df = DataFrame();
     for i in 1:Int64(result[].column_count)
@@ -21,40 +22,46 @@ function toDF(result)
         else
             mask = unsafe_wrap(Array,columns[i].nullmask,rows)
             data = unsafe_wrap(Array,(Ptr{DUCKDB_TYPES[type]}(columns[i].data)),rows)
-            
-            if type == DUCKDB_TYPE_DATE
-                column = Dates.epochdays2date.(data.+719528)
-            elseif type == DUCKDB_TYPE_VARCHAR
-                column = unsafe_string.(data)
-            else
-                column = data
-            end    
-            
+            bmask=reinterpret(Bool,mask)
+
             if 0!=sum(mask)
-                column = convert(Vector{Union{Missing,eltype(column)}},column)
-                column[reinterpret(Bool,mask)] .= missing
+                data = data[.!bmask]
+            end
+            if type == DUCKDB_TYPE_DATE
+                data = Dates.epochdays2date.(data.+719528)
+            elseif type == DUCKDB_TYPE_TIME
+                data = Dates.Time.(Dates.Nanosecond.(data.*1000))
+            elseif type == DUCKDB_TYPE_VARCHAR
+                data = unsafe_string.(data)
+            end    
+
+            if 0!=sum(mask)           
+                fulldata = Array{Union{Missing, eltype(data)}}(missing, rows)
+                fulldata[.!bmask] = data
+                data = fulldata
             end
 
-            df[!,name] = column           
+            df[!,name] = data           
         end
     end
     return df
 end
 """
+    disconnect(connection)
 Closes the specified connection and de-allocates all memory allocated for that connection.
-* connection: The connection to close.
+* `connection`: The connection to close.
 
 """
-function dbDisconnect(connection)
+function disconnect(connection)
     duckdb_disconnect(connection)
 end
 
 """
+    closedb(database)
 Closes the specified database and de-allocates all memory allocated for that database.\n
 This should be called after you are done with any database allocated through duckdb_open.\n
 Note that failing to call duckdb_close (in case of e.g. a program crash) will not cause data corruption. Still it is recommended to always correctly close a database object after you are done with it.
-
-*database: The database object to shut down.
+*`database`: the database object to shut down.
 
 """
 function closedb(database)
@@ -69,7 +76,7 @@ Creates a new database or opens an existing database file stored at the the give
 * returns: a connection handle
 
 """
-function dbConnect(file)
+function connect(file)
     database = Ref{Ptr{Cvoid}}()
     connection = Ref{Ptr{Cvoid}}()
     duckdb_open(file,database)
@@ -86,7 +93,7 @@ Note that after running duckdb_query, duckdb_destroy_result must be called on th
 * returns: the full result pointer
 
 """
-function dbExecute(connection,query) 
+function execute(connection,query) 
     result = Ref{duckdb_result}()
     duckdb_query(connection,query,result)
     if result[].error_message==Ptr{UInt8}(0)
