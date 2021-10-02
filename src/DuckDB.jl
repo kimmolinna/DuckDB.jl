@@ -68,7 +68,7 @@ function closedb(database)
     duckdb_close(database)
 end
 
-dbConnect() = dbConnect(":memory:")
+connect() = connect(":memory:")
 
 """
 Creates a new database or opens an existing database file stored at the the given path. If no path is given a new in-memory database is created instead.
