@@ -4,8 +4,12 @@ include("api.jl")
 include("consts.jl")
 
 "Define DuckDB library location\n"
-libduckdb = "libduckdb.so"
+global libduckdb = "libduckdb.so"
 
+function setlibduckdb(file)
+    global libduckdb = file
+    return libduckdb
+end     
 """
     toDataFrame(result)
 Creates a DataFrame from the full result
