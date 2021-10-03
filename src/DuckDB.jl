@@ -4,7 +4,7 @@ include("api.jl")
 include("consts.jl")
 
 "Define DuckDB library location\n"
-const libduckdb = "/home/kimmo/libduckdb/libduckdb.so"
+libduckdb = "libduckdb.so"
 
 """
     toDataFrame(result)

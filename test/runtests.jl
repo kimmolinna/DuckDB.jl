@@ -1,9 +1,5 @@
 import DuckDB
 con = DuckDB.connect(":memory:")
-res = DuckDB.execute(con,"CREATE TABLE ca_sr AS SELECT * FROM read_csv_auto('/home/kimmo/pluto/csv/test.csv');")
-res = DuckDB.execute(con,"SELECT * from ca_sr;")
-res = DuckDB.toDataFrame(res)
-
 res = DuckDB.execute(con,"CREATE TABLE integers(date DATE, jcol INTEGER);")
 res = DuckDB.execute(con,"INSERT INTO integers VALUES ('2021-09-27', 4), ('2021-09-28', 6), ('2021-09-29', 8);")
 res = DuckDB.execute(con,"SELECT * FROM integers;")
