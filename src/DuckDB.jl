@@ -1,7 +1,10 @@
 module DuckDB
-using DataFrames,Dates,DuckDB_jll
+using DataFrames,Dates #,DuckDB_jll
 include("api.jl")
 include("consts.jl")
+
+"Define DuckDB library location\n"
+const libduckdb = "/home/kimmo/libduckdb/libduckdb.so"
 
 """
     toDataFrame(result)
@@ -53,7 +56,7 @@ Closes the specified connection and de-allocates all memory allocated for that c
 
 """
 function disconnect(connection)
-    duckdb_disconnect(connection)
+   return duckdb_disconnect(connection)
 end
 
 """
@@ -65,7 +68,7 @@ Note that failing to call duckdb_close (in case of e.g. a program crash) will no
 
 """
 function close(database)
-    duckdb_close(database)
+    return duckdb_close(database)
 end
 
 connect() = connect(":memory:")

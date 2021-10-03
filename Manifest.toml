@@ -65,12 +65,6 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
-[[deps.DuckDB_jll]]
-deps = ["Libdl", "Pkg"]
-git-tree-sha1 = "9e9428b5ec33d67fed88ea6025752c82b1b4e274"
-uuid = "2cbbab25-fc8b-58cf-88d4-687a02676033"
-version = "0.2.1+0"
-
 [[deps.Formatting]]
 deps = ["Printf"]
 git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"

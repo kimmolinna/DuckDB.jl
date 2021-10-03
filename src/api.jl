@@ -12,7 +12,7 @@ If no path is given a new in-memory database is created instead.
 
 """
 function duckdb_open(path,out_database)
-	ccall( (:duckdb_open,libduckdb),Cint,(Ptr{UInt8},Ptr{Cvoid}),path,out_database)
+	return ccall( (:duckdb_open,libduckdb),Cint,(Ptr{UInt8},Ptr{Cvoid}),path,out_database)
 end
 """
 Closes the specified database and de-allocates all memory allocated for that database.
@@ -24,7 +24,7 @@ Still it is recommended to always correctly close a database object after you ar
 
 """
 function duckdb_close(database)
-	ccall((:duckdb_close,libduckdb),Cvoid,(Ptr{Cvoid},),database)
+	return ccall((:duckdb_close,libduckdb),Cvoid,(Ptr{Cvoid},),database)
 end
 """
 Opens a connection to a database. Connections are required to query the database, and store transactional state
@@ -36,7 +36,7 @@ associated with the connection.
 
 """
 function duckdb_connect(database,out_connection)
-	ccall( (:duckdb_connect,libduckdb),Cint,(Ptr{Cvoid},Ptr{Cvoid}),database[],out_connection)
+	return ccall( (:duckdb_connect,libduckdb),Cint,(Ptr{Cvoid},Ptr{Cvoid}),database[],out_connection)
 end
 
 """
@@ -45,7 +45,7 @@ Closes the specified connection and de-allocates all memory allocated for that c
 
 """
 function duckdb_disconnect(connection)
-	ccall( (:duckdb_disconnect,libduckdb),Cvoid,(Ptr{Cvoid},),connection)
+	return ccall( (:duckdb_disconnect,libduckdb),Cvoid,(Ptr{Cvoid},),connection)
 end
 
 
@@ -64,7 +64,7 @@ query fails, otherwise the error stored within the result will not be freed corr
 
 """
 function duckdb_query(connection,query,out_result)
-	ccall( (:duckdb_query,libduckdb),Cint,(Ptr{Cvoid},Ptr{UInt8},Ptr{Cvoid}),connection[],query,out_result)
+	return ccall( (:duckdb_query,libduckdb),Cint,(Ptr{Cvoid},Ptr{UInt8},Ptr{Cvoid}),connection[],query,out_result)
 end
 
 #=
