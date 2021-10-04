@@ -15,6 +15,6 @@ DuckDB.setlibduckdb("/home/kimmo/libduckdb/libduckdb.so)"
 con = DuckDB.connect(":memory:")<br>
 res = DuckDB.execute(con,"CREATE TABLE integers(date DATE, jcol INTEGER)")<br>
 res = DuckDB.execute(con,"INSERT INTO integers VALUES ('2021-09-27', 4), ('2021-09-28', 6), ('2021-09-29', 8)")<br>
-res = DuckDB.execute(con, "SELECT * FROM integers")
-DuckDB.toDataFrame(res)
-DuckDB.disconnect(con)
+res = DuckDB.execute(con, "SELECT * FROM integers")<br>
+DuckDB.toDataFrame(res)<br>
+DuckDB.disconnect(con)<br>
