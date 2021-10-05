@@ -31,9 +31,12 @@ function toDataFrame(result)
                 data = Dates.epochdays2date.(data.+719528)
             elseif type == DUCKDB_TYPE_TIME
                 data = Dates.Time.(Dates.Nanosecond.(data.*1000))
+            elseif type == DUCKDB_TYPE_TIMESTAMP
+                data = Dates.epochms2datetime.((data./1000).+62167219200000)
             elseif type == DUCKDB_TYPE_VARCHAR
                 data = unsafe_string.(data)
-            end    
+            end   
+
 
             if 0!=sum(mask)           
                 fulldata = Array{Union{Missing, eltype(data)}}(missing, rows)
