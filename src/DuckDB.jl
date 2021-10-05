@@ -1,15 +1,8 @@
 module DuckDB
-using DataFrames,Dates #,DuckDB_jll
+using DataFrames,Dates,DuckDB_jll
 include("api.jl")
 include("consts.jl")
 
-"Define DuckDB library location\n"
-global libduckdb = "libduckdb.so"
-
-function setlibduckdb(file)
-    global libduckdb = file
-    return libduckdb
-end     
 """
     toDataFrame(result)
 Creates a DataFrame from the full result

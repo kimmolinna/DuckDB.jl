@@ -4,13 +4,6 @@ pkg> add https://github.com/kimmolinna/julia-duckdb
 
 julia> import DuckDB
 
-Until DuckDB_jll.jl is updated you have to download shared C/C++-library from DuckDB webpage
- [DuckDB Installation](https://duckdb.org/docs/installation/)
-
-DuckDB.setlibduckdb("location_of_shared_library")<br>
-For example in Linux<br>
-DuckDB.setlibduckdb("/home/kimmo/libduckdb/libduckdb.so)"
-
 ## Basics
 con = DuckDB.connect(":memory:")<br>
 res = DuckDB.execute(con,"CREATE TABLE integers(date DATE, jcol INTEGER)")<br>
