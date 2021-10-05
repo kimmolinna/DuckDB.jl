@@ -70,7 +70,7 @@ end
 struct duckdb_interval 
 	months::Int32
 	days::Int32
-	micros::Int32
+	micros::Int64
 end
 
 """
@@ -121,8 +121,8 @@ DUCKDB_TYPES = Dict(
 	DUCKDB_TYPE_TIMESTAMP => Int64,
 	DUCKDB_TYPE_DATE => Int32,
 	DUCKDB_TYPE_TIME => Int64,
-	DUCKDB_TYPE_INTERVAL => Ref{duckdb_interval},
-	DUCKDB_TYPE_HUGEINT => Ref{duckdb_hugeint},
+	DUCKDB_TYPE_INTERVAL => duckdb_interval,
+	DUCKDB_TYPE_HUGEINT => duckdb_hugeint,
 	DUCKDB_TYPE_VARCHAR => Ptr{UInt8},
-	DUCKDB_TYPE_BLOB => Ref{duckdb_blob}
+	DUCKDB_TYPE_BLOB => duckdb_blob
 )

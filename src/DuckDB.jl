@@ -21,7 +21,7 @@ function toDataFrame(result)
             print("invalid type for column - \""*name*"\"") 
         else
             mask = unsafe_wrap(Array,columns[i].nullmask,rows)
-            data = unsafe_wrap(Array,(Ptr{DUCKDB_TYPES[type]}(columns[i].data)),rows)
+            data = unsafe_wrap(Array,Ptr{DUCKDB_TYPES[type]}(columns[i].data),rows)
             bmask=reinterpret(Bool,mask)
 
             if 0!=sum(mask)
@@ -33,6 +33,8 @@ function toDataFrame(result)
                 data = Dates.Time.(Dates.Nanosecond.(data.*1000))
             elseif type == DUCKDB_TYPE_TIMESTAMP
                 data = Dates.epochms2datetime.((data./1000).+62167219200000)
+            elseif type == DUCKDB_TYPE_INTERVAL
+                data = map(x -> Dates.CompoundPeriod(Dates.Month(x.months),Dates.Day(x.days),Dates.Microsecond(x.micros)),data)
             elseif type == DUCKDB_TYPE_VARCHAR
                 data = unsafe_string.(data)
             end   
