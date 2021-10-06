@@ -3,12 +3,23 @@ using DataFrames,Dates,DuckDB_jll
 include("api.jl")
 include("consts.jl")
 
-function toDataFrame(con::Ref{Ptr{Cvoid}},query::String)::DataFrame
-    res = execute(con,query)
-    return toDataFrame(res)
+"""
+    toDataFrame(connection::Ref{Ptr{Cvoid}},query::String)::DataFrame
+
+Creates a DataFrame from a SQL query within a connection.
+
+* `connection`: The connection to perform the query in.
+* `query`: The SQL query to run.
+* returns: the abstract dataframe
+
+"""
+function toDataFrame(connection::Ref{Ptr{Cvoid}},query::String)::DataFrame
+    res =  execute(connection,query)::Ref{duckdb_result}
+     return toDataFrame(res) 
 end
 """
-    toDataFrame(result)
+    toDataFrame(result::Ref{duckdb_result})::DataFrame
+
 Creates a DataFrame from the full result
 * `result`: the full result from `execute`
 * returns: the abstract dataframe
