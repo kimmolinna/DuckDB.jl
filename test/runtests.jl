@@ -1,5 +1,9 @@
+using Test
 import DuckDB
-con = DuckDB.connect(":memory:")
+
+@testset "DB Connection" begin
+    con = DuckDB.connect(":memory:")
+end
 
 res = DuckDB.execute(con,"CREATE TABLE huge(id INTEGER,data HUGE);")
 res = DuckDB.execute(con,"INSERT INTO huge VALUES (1,), (2, 1761718171), (3, 171661889178);")
