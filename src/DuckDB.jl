@@ -59,7 +59,7 @@ function toDataFrame(result::Ref{duckdb_result})::DataFrame
                     data,
                 )
             elseif type == DUCKDB_TYPE_HUGEINT
-                data = map(x -> x.upper == 0 ? x.lower::UInt64 : x, data)
+                data = map(x -> x.upper < 1 ? (x.lower::UInt64)%Int64 : x, data)
             elseif type == DUCKDB_TYPE_VARCHAR
                 data = unsafe_string.(data)
             end

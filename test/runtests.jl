@@ -5,6 +5,7 @@ import DuckDB
 @testset "DB Connection" begin
     con = DuckDB.connect(":memory:")
     @test isa(con, Base.RefValue{Ptr{Nothing}})
+    DuckDB.disconnect(con)
 end
 
 @testset "Test README" begin
@@ -21,17 +22,17 @@ end
 
     @test isa(DuckDB.toDataFrame(con, "SELECT * FROM integers"), DataFrame)
     DuckDB.disconnect(con)
-
 end
 
-# TODO: This seems to be broken in current version, "HUGE" type not supported error.
-# @testset "Create table huge" begin
-#     con = DuckDB.connect(":memory:")
-#     res = DuckDB.execute(con,"CREATE TABLE huge(id INTEGER, data HUGE);")
-#     res = DuckDB.execute(con,"INSERT INTO huge VALUES (1,), (2, 1761718171), (3, 171661889178);")
-#     res = DuckDB.toDataFrame(con,"SELECT * FROM huge")
-#     DuckDB.disconnect(con)        
-# end
+@testset "HUGE Int test" begin
+  con = DuckDB.connect(":memory:")  
+  res = DuckDB.toDataFrame(con,"SELECT CAST(-2^62 AS HUGEINT);")
+
+  res = DuckDB.execute(con,"CREATE TABLE huge(id INTEGER,data HUGEINT);")
+  res = DuckDB.execute(con,"INSERT INTO huge VALUES (1,none), (2, 1761718171), (3, 171661889178);")
+  res = DuckDB.toDataFrame(con,"SELECT * FROM huge")
+  DuckDB.disconnect(con)  
+end
 
 @testset "Interval type" begin
     con = DuckDB.connect(":memory:")
