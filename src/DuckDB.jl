@@ -51,7 +51,7 @@ function toDataFrame(result::Ref{duckdb_result})::DataFrame
             elseif type == DUCKDB_TYPE_INTERVAL
                 data = map(x -> Dates.CompoundPeriod(Dates.Month(x.months),Dates.Day(x.days),Dates.Microsecond(x.micros)),data)
             elseif type == DUCKDB_TYPE_HUGEINT
-                data = map(x -> x.upper == 0 ? x.lower::UInt64 : x, data)
+                data = map(x -> x.upper < 1 ? (x.lower::UInt64)%Int64 : x, data)
             elseif type == DUCKDB_TYPE_VARCHAR
                 data = unsafe_string.(data)
             end   
