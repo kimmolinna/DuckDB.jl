@@ -1,5 +1,5 @@
 module DuckDB
-using DataFrames,Dates,DuckDB_jll
+using DataFrames, Dates, DuckDB_jll
 include("api.jl")
 include("consts.jl")
 
@@ -13,9 +13,9 @@ Creates a DataFrame from a SQL query within a connection.
 * returns: the abstract dataframe
 
 """
-function toDataFrame(connection::Ref{Ptr{Cvoid}},query::String)::DataFrame
-    res =  execute(connection,query)::Ref{duckdb_result}
-     return toDataFrame(res) 
+function toDataFrame(connection::Ref{Ptr{Cvoid}}, query::String)::DataFrame
+    res = execute(connection, query)::Ref{duckdb_result}
+    return toDataFrame(res)
 end
 """
     toDataFrame(result::Ref{duckdb_result})::DataFrame
@@ -26,44 +26,52 @@ Creates a DataFrame from the full result
 
 """
 function toDataFrame(result::Ref{duckdb_result})::DataFrame
-    columns=unsafe_wrap(Array{duckdb_column},result[].columns,Int64(result[].column_count));
-    df = DataFrame();
-    for i in 1:Int64(result[].column_count)
+    columns =
+        unsafe_wrap(Array{duckdb_column}, result[].columns, Int64(result[].column_count))
+    df = DataFrame()
+    for i = 1:Int64(result[].column_count)
         rows = Int64(result[].row_count)
         name = (unsafe_string(columns[i].name))
         type = DUCKDB_TYPE(Int64(columns[i].type))
         if type == DUCKDB_TYPE_INVALID
-            print("invalid type for column - \""*name*"\"") 
+            print("invalid type for column - \"" * name * "\"")
         else
-            mask = unsafe_wrap(Array,columns[i].nullmask,rows)
-            data = unsafe_wrap(Array,Ptr{DUCKDB_TYPES[type]}(columns[i].data),rows)
-            bmask = reinterpret(Bool,mask)
+            mask = unsafe_wrap(Array, columns[i].nullmask, rows)
+            data = unsafe_wrap(Array, Ptr{DUCKDB_TYPES[type]}(columns[i].data), rows)
+            bmask = reinterpret(Bool, mask)
 
-            if 0!=sum(mask)
+            if 0 != sum(mask)
                 data = data[.!bmask]
             end
             if type == DUCKDB_TYPE_DATE
-                data = Dates.epochdays2date.(data.+719528)
+                data = Dates.epochdays2date.(data .+ 719528)
             elseif type == DUCKDB_TYPE_TIME
-                data = Dates.Time.(Dates.Nanosecond.(data.*1000))
+                data = Dates.Time.(Dates.Nanosecond.(data .* 1000))
             elseif type == DUCKDB_TYPE_TIMESTAMP
-                data = Dates.epochms2datetime.((data./1000).+62167219200000)
+                data = Dates.epochms2datetime.((data ./ 1000) .+ 62167219200000)
             elseif type == DUCKDB_TYPE_INTERVAL
-                data = map(x -> Dates.CompoundPeriod(Dates.Month(x.months),Dates.Day(x.days),Dates.Microsecond(x.micros)),data)
+                data = map(
+                    x -> Dates.CompoundPeriod(
+                        Dates.Month(x.months),
+                        Dates.Day(x.days),
+                        Dates.Microsecond(x.micros),
+                    ),
+                    data,
+                )
             elseif type == DUCKDB_TYPE_HUGEINT
                 data = map(x -> x.upper == 0 ? x.lower::UInt64 : x, data)
             elseif type == DUCKDB_TYPE_VARCHAR
                 data = unsafe_string.(data)
-            end   
+            end
 
 
-            if 0!=sum(mask)           
-                fulldata = Array{Union{Missing, eltype(data)}}(missing, rows)
+            if 0 != sum(mask)
+                fulldata = Array{Union{Missing,eltype(data)}}(missing, rows)
                 fulldata[.!bmask] = data
                 data = fulldata
             end
 
-            df[!,name] = data           
+            df[!, name] = data
         end
     end
     return df
@@ -75,7 +83,7 @@ Closes the specified connection and de-allocates all memory allocated for that c
 
 """
 function disconnect(connection)
-   return duckdb_disconnect(connection)
+    return duckdb_disconnect(connection)
 end
 
 """
@@ -102,8 +110,8 @@ Creates a new database or opens an existing database file stored at the the give
 function connect(path::String)::Ref{Ptr{Cvoid}}
     database = Ref{Ptr{Cvoid}}()
     connection = Ref{Ptr{Cvoid}}()
-    duckdb_open(path,database)
-    duckdb_connect(database,connection)
+    duckdb_open(path, database)
+    duckdb_connect(database, connection)
     return connection
 end
 
@@ -118,10 +126,10 @@ Note that after running duckdb_query, duckdb_destroy_result must be called on th
 * returns: the full result pointer
 
 """
-function execute(connection::Ref{Ptr{Cvoid}},query::String)::Ref{duckdb_result} 
+function execute(connection::Ref{Ptr{Cvoid}}, query::String)::Ref{duckdb_result}
     result = Ref{duckdb_result}()
-    duckdb_query(connection,query,result)
-    if result[].error_message!=Ptr{UInt8}(0)
+    duckdb_query(connection, query, result)
+    if result[].error_message != Ptr{UInt8}(0)
         print(unsafe_string(result[].error_message))
     end
     return result
