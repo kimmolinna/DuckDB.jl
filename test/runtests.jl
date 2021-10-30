@@ -9,7 +9,7 @@ import DuckDB
 end
 
 @testset "Test README" begin
-    con = DuckDB.connect(":memory:")
+    con = DuckDB.DB(":memory:")
 
     res = DuckDB.execute(con, "CREATE TABLE integers(date DATE, jcol INTEGER)")
     res = DuckDB.execute(
@@ -81,14 +81,17 @@ end
 end
 
 @testset "Integers and dates table" begin
-    con = DuckDB.connect(":memory:")
-    res = DuckDB.execute(con, "CREATE TABLE integers(date DATE, data INTEGER);")
-    res = DuckDB.execute(
-        con,
+    using DuckDB
+    db = DuckDB.DB()
+
+    res = DBInterface.execute(db, "CREATE TABLE integers(date DATE, data INTEGER);")
+    res = DBInterface.execute(
+        db,
         "INSERT INTO integers VALUES ('2021-09-27', 4), ('2021-09-28', 6), ('2021-09-29', 8);",
     )
-    res = DuckDB.execute(con, "SELECT * FROM integers;")
+    res = DBInterface.execute(db, "SELECT * FROM integers;")
     res = DuckDB.toDataFrame(res)
     @test isa(res, DataFrame)
-    DuckDB.disconnect(con)
+    DBInterface.close!(db)
+    close(db)
 end
