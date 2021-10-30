@@ -6,7 +6,6 @@
 pkg> add DuckDB
 
 julia> using DuckDB
-
 ```
 
 ## Basics
