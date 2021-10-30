@@ -7,7 +7,7 @@ export DBInterface
 include("api.jl")
 include("consts.jl")
 
-const DBHandle = Ptr{Cvoid}   # DuckDB DB connection handle
+const DBHandle = Ref{Ptr{Cvoid}}   # DuckDB DB connection handle
 
 """
     toDataFrame(connection::Ref{Ptr{Cvoid}},query::String)::DataFrame
@@ -93,7 +93,7 @@ function disconnect(connection)
 end
 
 """
-    closedb(database)
+    close(database)
 Closes the specified database and de-allocates all memory allocated for that database.\n
 This should be called after you are done with any database allocated through duckdb_open.\n
 Note that failing to call duckdb_close (in case of e.g. a program crash) will not cause data corruption. Still it is recommended to always correctly close a database object after you are done with it.
@@ -122,7 +122,7 @@ function connect(path::String)::Ref{Ptr{Cvoid}}
 end
 
 """
-    execute(connection, query) 
+    execute(connection, query)
 
 Executes a SQL query within a connection and returns the full (materialized) result. If the query fails to execute, `DuckDBError` is returned and the error message can be retrieved by calling `duckdb_result_error`.
 
@@ -177,29 +177,28 @@ mutable struct DB <: DBInterface.Connection
 
     function DB(f::AbstractString)
         f = String(isempty(f) ? f : expanduser(f))
-        handle = Ref{DBHandle}()
-        connection = Ref{Ptr{Cvoid}}()
 
         try
-            duckdb_open(f, handle)
-            duckdb_connect(handle, connection)
+            handle = connect(f)
 
-            db = new(f, handle[])
+            db = new(f, handle)
             finalizer(_close, db)
             return db
         catch
-            duckdberror(handle[])
+            duckdberror(handle)
         end
     end
 end
 
-function _close(db::DB)    
-    db.handle == C_NULL || duckdb_close(db)
+function _close(db::DB)
+    db.handle == C_NULL || duckdb_disconnect(db.handle)
     db.handle = C_NULL
     return
 end
 
 DB() = DB(":memory:")
+DBInterface.close!(db::DB) = _close(db)
+Base.close(db::DB) = _close(db)
 
 Base.show(io::IO, db::DuckDB.DB) = print(io, string("DuckDB.DB(", "\"$(db.file)\"", ")"))
 
@@ -215,7 +214,10 @@ Note that the returned result row iterator only supports a single-pass, forward-
 TODO: Support Tables.jl
 """
 function DBInterface.execute(db::DuckDB.DB, sql::String)
-    return execute(db.handle[], sql)
+
+    result = execute(db.handle, sql)
+
+    return result
 end
 
 end # module

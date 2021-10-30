@@ -4,7 +4,7 @@
 //===--------------------------------------------------------------------===//
 =#
 """
-	duckdb_open(path,out_database)
+	duckdb_open(path, out_database)
 
 Creates a new database or opens an existing database file stored at the the given path.
 If no path is given a new in-memory database is created instead.
@@ -38,7 +38,7 @@ function duckdb_close(database)
     return ccall((:duckdb_close, libduckdb), Cvoid, (Ptr{Cvoid},), database)
 end
 """
-	duckdb_connect(database,out_connection)
+	duckdb_connect(database, out_connection)
 
 Opens a connection to a database. Connections are required to query the database, and store transactional state
 associated with the connection.
