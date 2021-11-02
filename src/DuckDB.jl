@@ -150,8 +150,8 @@ duckdbexception(handle::DBHandle) = DuckDBException(duckdb_errmsg(handle))
 duckdberror(handle::DBHandle) = throw(duckdbexception(handle))
 
 """
-    `DuckDB.DB()` => in-memory SQLite database
-    `DuckDB.DB(file)` => file-based SQLite database
+    `DuckDB.DB()` => in-memory DuckDB database
+    `DuckDB.DB(file)` => file-based DuckDB database
 
 Constructors for a representation of a DuckDB database, either backed by an on-disk file or in-memory.
 
