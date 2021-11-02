@@ -200,10 +200,10 @@ DB() = DB(":memory:")
 DBInterface.close!(db::DB) = _close(db)
 Base.close(db::DB) = _close(db)
 
-Base.show(io::IO, db::DuckDB.DB) = print(io, string("DuckDB.DB(", "\"$(db.file)\"", ")"))
+Base.show(io::IO, db::DB) = print(io, string("DB(", "\"$(db.file)\"", ")"))
 
 """
-    DBInterface.execute(db::DuckDB.DB, sql::String, [params])
+    DBInterface.execute(db::DB, sql::String, [params])
 
 TODO: Support DBInterface statements
 
@@ -213,7 +213,7 @@ Note that the returned result row iterator only supports a single-pass, forward-
 
 TODO: Support Tables.jl
 """
-function DBInterface.execute(db::DuckDB.DB, sql::String)
+function DBInterface.execute(db::DB, sql::String)
 
     result = execute(db.handle, sql)
 

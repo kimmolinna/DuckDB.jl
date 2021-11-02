@@ -1,6 +1,7 @@
 using Test
-using DataFrames
-import DuckDB
+using DataFrames,DBInterface
+using DuckDB
+#include("../src/DuckDB.jl")
 
 @testset "DB Connection" begin
     con = DuckDB.connect(":memory:")
@@ -9,27 +10,22 @@ import DuckDB
 end
 
 @testset "Test README" begin
-    con = DuckDB.DB(":memory:")
-
+    con = DuckDB.connect(":memory:")
     res = DuckDB.execute(con, "CREATE TABLE integers(date DATE, jcol INTEGER)")
     res = DuckDB.execute(
         con,
         "INSERT INTO integers VALUES ('2021-09-27', 4), ('2021-09-28', 6), ('2021-09-29', 8)",
     )
     res = DuckDB.execute(con, "SELECT * FROM integers")
-
     @test isa(DuckDB.toDataFrame(res), DataFrame)
-
     @test isa(DuckDB.toDataFrame(con, "SELECT * FROM integers"), DataFrame)
     DuckDB.disconnect(con)
 end
 
 @testset "HUGE Int test" begin
   con = DuckDB.connect(":memory:")  
-  res = DuckDB.toDataFrame(con,"SELECT CAST(-2^62 AS HUGEINT);")
-
   res = DuckDB.execute(con,"CREATE TABLE huge(id INTEGER,data HUGEINT);")
-  res = DuckDB.execute(con,"INSERT INTO huge VALUES (1,none), (2, 1761718171), (3, 171661889178);")
+  res = DuckDB.execute(con,"INSERT INTO huge VALUES (1,NULL), (2, 1761718171), (3, 171661889178);")
   res = DuckDB.toDataFrame(con,"SELECT * FROM huge")
   DuckDB.disconnect(con)  
 end
@@ -81,11 +77,9 @@ end
 end
 
 @testset "Integers and dates table" begin
-    using DuckDB
     db = DuckDB.DB()
-
     res = DBInterface.execute(db, "CREATE TABLE integers(date DATE, data INTEGER);")
-    res = DBInterface.execute(
+    res = DBInterface.execute( 
         db,
         "INSERT INTO integers VALUES ('2021-09-27', 4), ('2021-09-28', 6), ('2021-09-29', 8);",
     )
@@ -93,5 +87,4 @@ end
     res = DuckDB.toDataFrame(res)
     @test isa(res, DataFrame)
     DBInterface.close!(db)
-    close(db)
 end
