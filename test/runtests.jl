@@ -1,5 +1,5 @@
 using Test
-using DataFrames,DBInterface
+using DataFrames, DBInterface
 using DuckDB
 #include("../src/DuckDB.jl")
 
