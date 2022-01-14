@@ -88,3 +88,13 @@ end
     @test isa(res, DataFrame)
     DBInterface.close!(db)
 end
+
+@testset "Query CSV and output DataFrame" begin
+    df = DataFrame(a=1:100, b=1:100)
+    CSV.write("test_dataframe.csv", df)
+
+    con = DuckDB.connect(":memory:")
+    df1 = DuckDB.toDataFrame(con, """SELECT * FROM 'dataframe.csv';""")
+    
+    @test df == df1
+end
