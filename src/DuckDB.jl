@@ -32,8 +32,7 @@ Creates a DataFrame from the full result
 
 """
 function toDataFrame(result::Ref{duckdb_result})::DataFrame
-    columns =
-        unsafe_wrap(Array{duckdb_column}, result[].columns, Int64(result[].column_count))
+    columns = unsafe_wrap(Array{duckdb_column}, result[].columns, Int64(result[].column_count))
     df = DataFrame()
     for i = 1:Int64(result[].column_count)
         rows = Int64(result[].row_count)
@@ -74,13 +73,12 @@ function toDataFrame(result::Ref{duckdb_result})::DataFrame
                 data = unsafe_string.(data)
             end
 
-
             if 0 != sum(mask)
                 fulldata = Array{Union{Missing,eltype(data)}}(missing, rows)
                 fulldata[.!bmask] = data
                 data = fulldata
             end
-
+            
             df[!, name] = data
         end
     end
@@ -167,6 +165,22 @@ end
 duckdb_errmsg(handle) = unsafe_string(handle[].error_message)
 duckdbexception(handle::DBHandle) = DuckDBException(duckdb_errmsg(handle))
 duckdberror(handle::DBHandle) = throw(duckdbexception(handle))
+
+"""
+    appender_create(connection, table, schema)
+
+Creates appender object used to append new entries to an existing table
+
+* `connection`: The connection to create the appender for
+* `table`: Name of the table to append to
+* `schema`: Name of the schema of the table to append to, optional argument that defaults to "main"
+* returns: The appender object
+"""
+function appender_create(connection::Ref{Ptr{Cvoid}}, table::String, schema::String="main")
+    appender = Ref{Ptr{Cvoid}}()
+    duckdb_appender_create(connection, schema, table, appender)
+    return appender
+end
 
 """
     `DuckDB.DB()` => in-memory DuckDB database

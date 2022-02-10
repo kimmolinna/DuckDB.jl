@@ -20,7 +20,7 @@ end
     DuckDB.execute(con, "CREATE TABLE dtypes(bol BOOLEAN, tint TINYINT, sint SMALLINT, int INTEGER, bint BIGINT, utint UTINYINT, usint USMALLINT, uint UINTEGER, ubint UBIGINT, float FLOAT, double DOUBLE, date DATE, time TIME, vchar VARCHAR)")
 
     # Create the appender
-    appender = DuckDB.appender_create(con, "main", "dtypes")
+    appender = DuckDB.appender_create(con, "dtypes")
 
     # Append the different data types
     DuckDB.duckdb_append_bool(appender, true)
