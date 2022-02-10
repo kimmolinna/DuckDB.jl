@@ -49,7 +49,11 @@ function toDataFrame(result::Ref{duckdb_result})::DataFrame
             if 0 != sum(mask)
                 data = data[.!bmask]
             end
-            if type == DUCKDB_TYPE_DATE
+
+            # Format the different datatypes for DataFrame
+            if type == DUCKDB_TYPE_BOOLEAN
+                data = Bool.(data)
+            elseif type == DUCKDB_TYPE_DATE
                 data = Dates.epochdays2date.(data .+ 719528)
             elseif type == DUCKDB_TYPE_TIME
                 data = Dates.Time.(Dates.Nanosecond.(data .* 1000))
