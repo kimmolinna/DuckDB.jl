@@ -69,6 +69,31 @@ end
     DuckDB.close(db)
 end
 
+@testset "Test append DataFrame" begin
+    # Open the database
+    db = DuckDB.open(":memory:")
+    con = DuckDB.connect(db)
+
+    # Create the table the data is appended to
+    DuckDB.execute(con, "CREATE TABLE dtypes(bol BOOLEAN, tint TINYINT, sint SMALLINT, int INTEGER, bint BIGINT, utint UTINYINT, usint USMALLINT, uint UINTEGER, ubint UBIGINT, float FLOAT, double DOUBLE, date DATE, time TIME, vchar VARCHAR, nullval INTEGER)")
+
+    # Create test DataFrame
+    input_df = DataFrame(a=[true, false], b=Int8.(1:2), c=Int16.(1:2), d=Int32.(1:2), e=Int64.(1:2), f=UInt8.(1:2), g=UInt16.(1:2), h=UInt32.(1:2), i=UInt64.(1:2), j=Float32.(1:2), k=Float64.(1:2), l=[Dates.Date("1970-04-11"), Dates.Date("1970-04-12")], m=[Dates.Time(0, 0, 0, 0, 100), Dates.Time(0, 0, 0, 0, 200)], n=["Foo", "Bar"], o=[missing, 2])
+
+    # append the DataFrame to the table
+    DuckDB.appendDataFrame(con, dtypes)
+
+    # Output the data from the table
+    output_df = DuckDB.toDataFrame(con, "select * from dtypes;")
+
+    # Test if the input data frame equals the output dataframe
+    @test input_df == output_df
+
+    # Disconnect and close the database
+    DuckDB.disconnect(con)
+    DuckDB.close(db)
+end
+
 @testset "Test README" begin
     db = DuckDB.open(":memory:")
     con = DuckDB.connect(db)
