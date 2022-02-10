@@ -17,7 +17,7 @@ end
     con = DuckDB.connect(db)
 
     # Create the table the data is appended to
-    DuckDB.execute(con, "CREATE TABLE dtypes(bol BOOLEAN, tint TINYINT, sint SMALLINT, int INTEGER, bint BIGINT, utint UTINYINT, usint USMALLINT, uint UINTEGER, ubint UBIGINT, float FLOAT, double DOUBLE, date DATE, time TIME, vchar VARCHAR)")
+    DuckDB.execute(con, "CREATE TABLE dtypes(bol BOOLEAN, tint TINYINT, sint SMALLINT, int INTEGER, bint BIGINT, utint UTINYINT, usint USMALLINT, uint UINTEGER, ubint UBIGINT, float FLOAT, double DOUBLE, date DATE, time TIME, vchar VARCHAR, nullval INTEGER)")
 
     # Create the appender
     appender = DuckDB.appender_create(con, "dtypes")
@@ -37,6 +37,7 @@ end
     DuckDB.duckdb_append_date(appender, 100)
     DuckDB.duckdb_append_time(appender, 200)
     DuckDB.duckdb_append_varchar(appender, "Foo")
+    DuckDB.duckdb_append_null(appender)
     # End the row of the appender
     DuckDB.duckdb_appender_end_row(appender)
     # Destroy the appender and flush the data
@@ -61,6 +62,7 @@ end
     @test data[12] === Dates.Date("1970-04-11")
     @test data[13] === Dates.Time(0, 0, 0, 0, 200)
     @test data[14] === "Foo"
+    @test data[15] === missing
 
     # Disconnect and close the database
     DuckDB.disconnect(con)
