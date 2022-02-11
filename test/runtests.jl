@@ -106,7 +106,9 @@ end
     )
     res = DuckDB.execute(con, "SELECT * FROM integers")
     @test isa(DuckDB.toDataFrame(res), DataFrame)
-    @test isa(DuckDB.toDataFrame(con, "SELECT * FROM integers"), DataFrame)
+    df = DuckDB.toDataFrame(con, "SELECT * FROM integers")
+    @test isa(df, DataFrame)
+    DuckDB.appendDataFrame(df, con, "integers")
     DuckDB.disconnect(con)
     DuckDB.close(db)
 end
