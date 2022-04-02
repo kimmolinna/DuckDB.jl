@@ -27,7 +27,7 @@ df = DuckDB.toDataFrame(res)
 
 df = DuckDB.toDataFrame(con, "SELECT * FROM integers;")
 
-res = DuckDB.execute(con, "COPY (SELECT * FROM intergers) TO 'test.parquet' (FORMAT 'parquet');")
+res = DuckDB.execute(con, "COPY (SELECT * FROM integers) TO 'test.parquet' (FORMAT 'parquet');")
 
 res = DuckDB.execute(con, "SELECT * FROM 'test.parquet';")
 
